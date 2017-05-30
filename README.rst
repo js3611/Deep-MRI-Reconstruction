@@ -16,7 +16,7 @@ Usage::
 
 If you used this code for your work, you must cite the following work::
 
-  Schlemper, J., Caballero, J., Hajnal, J. V., Price, A., & Rueckert, D. (2017). A Deep Cascade of Convolutional Neural Networks for MR Image Reconstruction. Information Processing in Medical Imaging (IPMI), 2017
+  Schlemper, J., Caballero, J., Hajnal, J. V., Price, A., & Rueckert, D. A Deep Cascade of Convolutional Neural Networks for MR Image Reconstruction. Information Processing in Medical Imaging (IPMI), 2017
 
 ----
 
