@@ -56,10 +56,10 @@ def iterate_minibatch(data, batch_size, shuffle=True):
 
 def create_dummy_data():
     """
-    Creates dummy dataset from one knee subject.
+    Creates dummy dataset from one knee subject for demo.
     In practice, one should take much bigger dataset,
     as well as train & test should have similar distribution.
-
+    
     Source: http://mridata.org/
     """
     data = loadmat(join(project_root, './data/lustig_knee_p2.mat'))['xn']
@@ -174,8 +174,8 @@ if __name__ == '__main__':
             train_err += err
             train_batches += 1
 
-            if train_batches == 100:
-                break
+            # if train_batches == 100:
+            #     break
 
         validate_err = 0
         validate_batches = 0
@@ -185,8 +185,8 @@ if __name__ == '__main__':
             validate_err += err
             validate_batches += 1
 
-            if validate_batches == 10:
-                break
+            # if validate_batches == 10:
+            #     break
 
         vis = []
         test_err = 0
@@ -211,8 +211,8 @@ if __name__ == '__main__':
                             from_lasagne_format(im_und)[0],
                             from_lasagne_format(mask, mask=True)[0]))
 
-            if test_batches == 100:
-                break
+            # if test_batches == 100:
+            #     break
 
         t_end = time.time()
 
