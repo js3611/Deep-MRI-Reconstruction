@@ -1,0 +1,9 @@
+*.pyc
+models
+*~
+*.tmp
+*.orig
+*.remote
+*.base
+deep_mri
+*.#*
