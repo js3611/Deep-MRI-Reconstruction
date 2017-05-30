@@ -16,7 +16,7 @@ from scipy.io import loadmat
 from utils import compressed_sensing as cs
 from utils.metric import complex_psnr
 
-from cascadenet.network.model import build_d2_c2
+from cascadenet.network.model import build_d2_c2  # , build_d5_c5
 from cascadenet.util.helpers import from_lasagne_format
 from cascadenet.util.helpers import to_lasagne_format
 
@@ -26,14 +26,15 @@ def prep_input(im, gauss_ivar=1e-3):
 
     Parameters
     ----------
-    gauss_ivar: float - controls the undersampling rate. higher the value, more undersampling 
+    gauss_ivar: float - controls the undersampling rate.
+                        higher the value, more undersampling
     """
     mask = cs.cartesian_mask(im.shape, gauss_ivar,
                              centred=False,
                              sample_high_freq=True,
                              sample_centre=True,
                              sample_n=8)
-    # mask = cs.one_line(im.shape)
+
     im_und, k_und = cs.undersample(im, mask, centred=False, norm='ortho')
 
     im_gnd_l = to_lasagne_format(im)
@@ -59,7 +60,7 @@ def create_dummy_data():
     Creates dummy dataset from one knee subject for demo.
     In practice, one should take much bigger dataset,
     as well as train & test should have similar distribution.
-    
+
     Source: http://mridata.org/
     """
     data = loadmat(join(project_root, './data/lustig_knee_p2.mat'))['xn']
@@ -91,8 +92,7 @@ def compile_fn(network, net_config, args):
     # complex valued signal has 2 channels, which counts as 1.
     loss_sq = lasagne.objectives.squared_error(target_var, pred).mean() * 2
     if l2:
-        l2_penalty = lasagne.regularization.regularize_network_params(network,
-                                                                      lasagne.regularization.l2)
+        l2_penalty = lasagne.regularization.regularize_network_params(network, lasagne.regularization.l2)
         loss = loss_sq + l2_penalty * l2
 
     update_rule = lasagne.updates.adam
@@ -126,8 +126,11 @@ if __name__ == '__main__':
                         default=['1e-6'], help='l2 regularisation')
     parser.add_argument('--gauss_ivar', metavar='float', nargs=1,
                         default=['0.0015'],
-                        help='Sensitivity for Gaussian Distribution which decides the undersampling rate of the Cartesian mask')
-    parser.add_argument('--savefig', action='store_true', help='Save output images and masks')
+                        help='Sensitivity for Gaussian Distribution which'
+                        'decides the undersampling rate of the Cartesian mask')
+    parser.add_argument('--debug', action='store_true', help='debug mode')
+    parser.add_argument('--savefig', action='store_true',
+                        help='Save output images and masks')
 
     args = parser.parse_args()
 
@@ -149,9 +152,10 @@ if __name__ == '__main__':
     # Specify network
     input_shape = (batch_size, 2, Nx, Ny)
     net_config, net,  = build_d2_c2(input_shape)
+    # net_config, net,  = build_d5_c5(input_shape)
 
     # Compute acceleration rate
-    dummy_mask = cs.cartesian_mask((100, Nx, Ny), gauss_ivar,
+    dummy_mask = cs.cartesian_mask((500, Nx, Ny), gauss_ivar,
                                    sample_high_freq=True,
                                    sample_centre=True, sample_n=8)
     acc = dummy_mask.size / np.sum(dummy_mask)
@@ -160,7 +164,7 @@ if __name__ == '__main__':
     # Compile function
     train_fn, val_fn = compile_fn(net, net_config, args)
 
-    # Create Dataset
+    # Create dataset
     train, validate, test = create_dummy_data()
 
     for epoch in xrange(num_epoch):
@@ -174,8 +178,8 @@ if __name__ == '__main__':
             train_err += err
             train_batches += 1
 
-            # if train_batches == 100:
-            #     break
+            if args.debug and train_batches == 20:
+                break
 
         validate_err = 0
         validate_batches = 0
@@ -185,8 +189,8 @@ if __name__ == '__main__':
             validate_err += err
             validate_batches += 1
 
-            # if validate_batches == 10:
-            #     break
+            if args.debug and validate_batches == 20:
+                break
 
         vis = []
         test_err = 0
@@ -211,28 +215,38 @@ if __name__ == '__main__':
                             from_lasagne_format(im_und)[0],
                             from_lasagne_format(mask, mask=True)[0]))
 
-            # if test_batches == 100:
-            #     break
+            if args.debug and test_batches == 20:
+                break
 
         t_end = time.time()
 
+        train_err /= train_batches
+        validate_err /= validate_batches
+        test_err /= test_batches
+        base_psnr /= (test_batches*batch_size)
+        test_psnr /= (test_batches*batch_size)
+
         # Then we print the results for this epoch:
-        print("Epoch {}/{}".format(epoch+1, num_epoch+1))
+        print("Epoch {}/{}".format(epoch+1, num_epoch))
         print(" time: {}s".format(t_end - t_start))
-        print(" training loss:\t\t{:.6f}".format(train_err / max(1, train_batches)))
-        print(" validation loss:\t{:.6f}".format(validate_err / validate_batches))
-        print(" test loss:\t\t{:.6f}".format(test_err / test_batches))
-        print(" base PSNR:\t\t{:.6f}".format(base_psnr / (test_batches*batch_size)))
-        print(" test PSNR:\t\t{:.6f}".format(test_psnr / (test_batches*batch_size)))
+        print(" training loss:\t\t{:.6f}".format(train_err))
+        print(" validation loss:\t{:.6f}".format(validate_err))
+        print(" test loss:\t\t{:.6f}".format(test_err))
+        print(" base PSNR:\t\t{:.6f}".format(base_psnr))
+        print(" test PSNR:\t\t{:.6f}".format(test_psnr))
 
         # save the model
-        if save_fig and (epoch % save_every == 0 or epoch in [1, 2, num_epoch-1]):
-            i = 0
-            for im_i, pred_i, und_i, mask_i in vis:
-                plt.imsave(join(save_dir, 'im{0}.png'.format(i)),
-                           abs(np.concatenate([und_i, pred_i, im_i, im_i - pred_i], 1)), cmap='gray')
-                plt.imsave(join(save_dir, 'mask{0}.png'.format(i)), mask_i, cmap='gray')
-                i += 1
+        if epoch in [1, 2, num_epoch-1]:
+            if save_fig:
+                i = 0
+                for im_i, pred_i, und_i, mask_i in vis:
+                    plt.imsave(join(save_dir, 'im{0}.png'.format(i)),
+                               abs(np.concatenate([und_i, pred_i,
+                                                   im_i, im_i - pred_i], 1)),
+                               cmap='gray')
+                    plt.imsave(join(save_dir, 'mask{0}.png'.format(i)), mask_i,
+                               cmap='gray')
+                    i += 1
 
             name = '%s_epoch_%d.npz' % (model_name, epoch)
             np.savez(join(save_dir, name),

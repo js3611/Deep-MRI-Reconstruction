@@ -79,9 +79,6 @@ def cartesian_mask(shape, ivar, centred=False,
         yc = Ny / 2
         mask[:, xc - s:xc + s, :] = True
 
-    if Nt == 1:
-        return mask.reshape((Nx, Ny))
-
     if not centred:
         mask = mymath.ifftshift(mask, axes=(-1, -2))
 
