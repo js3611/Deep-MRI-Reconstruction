@@ -24,6 +24,7 @@ else:
     use_cuda = False
     print "Using CPU version of fft layers"
 
+
 from cascadenet.network.theano_extensions.fft_helper import fftshift, ifftshift
 from cascadenet.network.theano_extensions.fft import fft, ifft
 

@@ -155,17 +155,17 @@ if __name__ == '__main__':
     # Create dataset
     train, validate, test = create_dummy_data()
 
-    # Create mask and compute acceleration rate
-    dummy_mask = cs.cartesian_mask((1, Nx, Ny//Ny_red), acc, sample_n=8)
+    # Test creating mask and compute the acceleration rate
+    dummy_mask = cs.cartesian_mask((10, Nx, Ny//Ny_red), acc, sample_n=8)
     sample_und_factor = cs.undersampling_rate(dummy_mask)
     print('Undersampling Rate: {:.2f}'.format(sample_und_factor))
 
     # Specify network
     input_shape = (batch_size, 2, Nx, Ny//Ny_red, Nt)
     net_config, net,  = build_d2_c2_s(input_shape)
-    # net_config, net,  = build_d5_c10_s(input_shape)
 
-    # # load parameters
+    # # build D5-C10(S) with pre-trained parameters
+    # net_config, net,  = build_d5_c10_s(input_shape)
     # with np.load('./models/pretrained/d5_c10_s.npz') as f:
     #     param_values = [f['arr_{0}'.format(i)] for i in range(len(f.files))]
     #     lasagne.layers.set_all_param_values(net, param_values)
