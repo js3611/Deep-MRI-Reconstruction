@@ -16,7 +16,7 @@ from scipy.io import loadmat
 from utils import compressed_sensing as cs
 from utils.metric import complex_psnr
 
-from cascadenet.network.model import build_d2_c2  # , build_d5_c5
+from cascadenet.network.model import build_d2_c2, build_d5_c5
 from cascadenet.util.helpers import from_lasagne_format
 from cascadenet.util.helpers import to_lasagne_format
 
@@ -151,8 +151,8 @@ if __name__ == '__main__':
 
     # Specify network
     input_shape = (batch_size, 2, Nx, Ny)
-    net_config, net,  = build_d2_c2(input_shape)
-    # net_config, net,  = build_d5_c5(input_shape)
+    # net_config, net,  = build_d2_c2(input_shape)
+    net_config, net,  = build_d5_c5(input_shape)
 
     # Compute acceleration rate
     dummy_mask = cs.cartesian_mask((500, Nx, Ny), gauss_ivar,

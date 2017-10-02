@@ -222,3 +222,7 @@ def get_phase(x):
     xi = np.imag(x)
     phase = np.arctan(xi / (xr + 1e-12))
     return phase
+
+
+def undersampling_rate(mask):
+    return float(mask.sum()) / mask.size
