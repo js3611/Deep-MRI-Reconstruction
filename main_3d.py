@@ -88,7 +88,7 @@ def compile_fn(network, net_config, args):
     input_var = net_config['input'].input_var
     mask_var = net_config['mask'].input_var
     kspace_var = net_config['kspace_input'].input_var
-    target_var = T.tensor4('targets')
+    target_var = T.tensor5('targets')
 
     # Objective
     pred = lasagne.layers.get_output(network)

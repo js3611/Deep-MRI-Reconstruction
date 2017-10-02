@@ -37,11 +37,11 @@ def cascade_resnet_3d_avg(pr, net, input_layer, n=5, nf=64,
     # Conv layers
     net[pr+'conv1'] = l.Conv3D(net[pr+'kavg'], nf, k, b=b(), name=pr+'conv1')
 
-    for i in xrange(n):
+    for i in xrange(2, n):
         net[pr+'conv%d'%i] = l.Conv3D(net[pr+'conv%d'%(i-1)], nf, k, b=b(),
                                       name=pr+'conv%d'%i)
 
-    net[pr+'conv_aggr'] = l.Conv3DAggr(net[pr+'conv%'(n-1)], n_channel, k,
+    net[pr+'conv_aggr'] = l.Conv3DAggr(net[pr+'conv%d'%(n-1)], n_channel, k,
                                        b=b(), name=pr+'conv_aggr')
     net[pr+'res'] = l.ResidualLayer([net[pr+'conv_aggr'], input_layer],
                                     name=pr+'res')
