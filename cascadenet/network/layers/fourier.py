@@ -116,7 +116,7 @@ class FFT2GPULayer(Layer):
         self.fn = fft2g if not inv else ifft2g
         self.is_3d = len(data_shape) == 5
         self.norm = norm
-        
+
     def get_output_for(self, input, **kwargs):
         '''
         Computes 2D FFT. Input layer must have dimension (n, 2, nx, ny[, nt])
@@ -221,7 +221,6 @@ class FT2Layer(Layer):
         return out
 
 
-
 class FFTCLayer(Layer):
     def __init__(self, incoming, data_shape, norm=None,
                  inv=False, **kwargs):
@@ -255,15 +254,15 @@ class FFTCLayer(Layer):
 
     def get_output_for(self, input, **kwargs):
         '''
-        Computes FFTC. Input layer must have dimension 
+        Computes FFTC. Input layer must have dimension
         '''
         if self.is_3d:
-            #  Convert to (n, nx, ny[, nt], 2) for fft 
+            #  Convert to (n, nx, ny[, nt], 2) for fft
             tmp = input.dimshuffle((0, 2, 3, 4, 1))
             tmp_shifted = ifftshift(tmp, axes=(-2,))
             tmp_tfx_shifted = self.fn(tmp_shifted, norm=self.norm)
             tmp_tfx = fftshift(tmp_tfx_shifted, axes=(-2,))
-            #  Convert back to (n, 2, nx, ny[, nt]) 
+            #  Convert back to (n, 2, nx, ny[, nt])
             return tmp_tfx.dimshuffle((0, 4, 1, 2, 3))
 
         else:
@@ -274,8 +273,6 @@ class FFTCLayer(Layer):
             data_xt = fftshift(data_xt, axes=(-2,))
             return data_xt.dimshuffle((0, 3, 1, 2))
 
-# FFT2Layer = FFT2CPULayer
-# FFT2Layer = FFT2GPULayer
 if use_cuda:
     FFT2Layer = FFT2GPULayer
 else:

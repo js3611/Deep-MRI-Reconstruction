@@ -158,7 +158,7 @@ if __name__ == '__main__':
     dummy_mask = cs.cartesian_mask((500, Nx, Ny), gauss_ivar,
                                    sample_high_freq=True,
                                    sample_centre=True, sample_n=8)
-    acc = dummy_mask.size / np.sum(dummy_mask)
+    acc = cs.undersampling_rate(dummy_mask)
     print('Acceleration Rate: {:.2f}'.format(acc))
 
     # Compile function
