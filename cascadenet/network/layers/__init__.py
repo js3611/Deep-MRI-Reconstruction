@@ -9,6 +9,7 @@ from .fourier import *
 from .data_consistency import *
 from .helper import *
 from .kspace_averaging import *
+from .kspace_pytorch import *
 try:
     from .conv3d import *
 except ImportError as e:

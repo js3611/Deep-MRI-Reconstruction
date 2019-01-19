@@ -60,17 +60,17 @@ def cartesian_mask(shape, acc, sample_n=10, centred=False):
     pdf_x += lmda * 1./Nx
 
     if sample_n:
-        pdf_x[Nx/2-sample_n/2:Nx/2+sample_n/2] = 0
+        pdf_x[Nx//2-sample_n//2:Nx//2+sample_n//2] = 0
         pdf_x /= np.sum(pdf_x)
         n_lines -= sample_n
 
     mask = np.zeros((N, Nx))
-    for i in xrange(N):
+    for i in range(N):
         idx = np.random.choice(Nx, n_lines, False, pdf_x)
         mask[i, idx] = 1
 
     if sample_n:
-        mask[:, Nx/2-sample_n/2:Nx/2+sample_n/2] = 1
+        mask[:, Nx//2-sample_n//2:Nx//2+sample_n//2] = 1
 
     size = mask.itemsize
     mask = as_strided(mask, (N, Nx, Ny), (size * Nx, size, 0))
