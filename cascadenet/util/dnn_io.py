@@ -1,43 +1,5 @@
 import numpy as np
 
-
-def complex2real(x, swap=True):
-    '''
-    Parameter
-    ---------
-    x: ndarray
-        assumes at least 2d. Last 2D axes are split in terms of real and imag
-        2d/3d/4d complex valued tensor (n, nx, ny) or (n, nx, ny, nt)
-
-    swap: if swap, then transposes
-
-    Returns
-    -------
-    y: 4d tensor If swap==True (default), then (n, 2, nx, ny), else (2, n, nx, ny).
-    '''
-    x_real = np.real(x)
-    x_imag = np.imag(x)
-    y = np.array([x_real, x_imag]).astype(np.float32)
-    # re-order in convenient order
-    if x.ndim >= 3 and swap:
-        y = y.swapaxes(0, 1)
-    return y
-
-
-def real2complex(x):
-    '''
-    Converts from array of the form ([n, ]2, nx, ny[, nt]) to ([n, ]nx, ny[, nt])
-    '''
-    x = np.asarray(x)
-    if x.shape[0] == 2 and x.shape[1] != 2:  # Hacky check
-        return x[0] + x[1] * 1j
-    elif x.shape[1] == 2:
-        y = x[:, 0] + x[:, 1] * 1j
-        return y
-    else:
-        raise ValueError('Invalid dimension')
-
-
 def r2c(x, axis=1):
     """Convert pseudo-complex data (2 real channels) to complex data
 
@@ -85,11 +47,6 @@ def c2r(x, axis=0):
     return x
 
 
-
-def mask_c2r(m):
-    return complex2real(m * (1+1j))
-
-
 def mask_r2c(m):
     return m[0] if m.ndim == 3 else m[:, 0]
 
@@ -106,7 +63,7 @@ def to_tensor_format(x, mask=False):
     if mask:  # Hacky solution
         x = x*(1+1j)
 
-    x = complex2real(x)
+    x = c2r(x)
 
     return x
 
@@ -122,6 +79,6 @@ def from_tensor_format(x, mask=False):
     if mask:
         x = mask_r2c(x)
     else:
-        x = real2complex(x)
+        x = r2c(x)
 
     return x
