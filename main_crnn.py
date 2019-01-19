@@ -63,12 +63,7 @@ def create_dummy_data():
     ny_red = 8
     sl = ny//ny_red
     data_t = np.transpose(data, (2, 0, 1))
-
-    # data_t[:, :, :sl*4]
-    # train_slice = data_t[:, :, :sl*4]
-    # validate_slice = data_t[:, :, ny//2:ny//2+ny//4]
-    # test_slice = data_t[:, :, ny//2+ny//4]
-
+    
     # Synthesize data by extracting patches
     train = np.array([data_t[..., i:i+sl] for i in np.random.randint(0, sl*3, 20)])
     validate = np.array([data_t[..., i:i+sl] for i in (sl*4, sl*5)])
@@ -85,8 +80,6 @@ if __name__ == '__main__':
                         help='batch size')
     parser.add_argument('--lr', metavar='float', nargs=1,
                         default=['0.001'], help='initial learning rate')
-    parser.add_argument('--l2', metavar='float', nargs=1,
-                        default=['1e-6'], help='l2 regularisation')
     parser.add_argument('--acceleration_factor', metavar='float', nargs=1,
                         default=['4.0'],
                         help='Acceleration factor for k-space sampling')
@@ -96,6 +89,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     cuda = True if torch.cuda.is_available() else False
+    Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
 
     # Project config
     model_name = 'crnn_mri'
@@ -127,8 +121,6 @@ if __name__ == '__main__':
     criterion = torch.nn.MSELoss()
     criterion.cuda()
     optimizer = optim.Adam(rec_net.parameters(), lr=float(args.lr[0]), betas=(0.5, 0.999))
-
-    Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
 
     # # build CRNN-MRI with pre-trained parameters
     # rec_net.load_state_dict(torch.load('./models/pretrained/crnn_mri_d5_c5.pth'))
