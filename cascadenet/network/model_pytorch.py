@@ -121,7 +121,6 @@ class StochasticDnCn(DnCn):
 
             x_cnn = self.conv_blocks[i](x)
             x = x + x_cnn
-            # x = self.conv_blocks[i](x)
             x = self.dcs[i].perform(x, k, m)
 
         return x
@@ -190,7 +189,6 @@ class DnCn3DDS(nn.Module):
         kwargs.update({'n_out': 2})
 
         for i in range(nc):
-            #kavgs.append(cl.AveragingInKspace(fr_d, i>0, True, norm='ortho'))
             kavgs.append(cl.AveragingInKspace(fr_d, i>0, clipped, norm='ortho'))
             conv_blocks.append(conv_layer(n_channels, nd, **kwargs))
             dcs.append(cl.DataConsistencyInKspace(norm='ortho'))
