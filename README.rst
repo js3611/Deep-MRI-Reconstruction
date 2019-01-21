@@ -1,11 +1,12 @@
-Deep Cascade of Convolutional Neural Networks for MR Image Reconstruction
+Deep Cascade of Convolutional Neural Networks and Convolutioanl Recurrent Nerual Networks for MR Image Reconstruction
+
 =========================================================================
 
 Reconstruct MR images from its undersampled measurements using Deep Cascade of
-Convolutional Neural Networks (DC-CNN). This repository contains the
-implementation of DC-CNN using Theano and Lasagne and the simple demo. Note that
+Convolutional Neural Networks (DC-CNN) and Convolutional Recurrent Neural Networks (CRNN-MRI). This repository contains the
+implementation of DC-CNN using Theano and Lasagne, and CRNN-MRI using PyTorch, along with simple demos. Note that
 the library requires the dev version of Lasagne and Theano, as well as pygpu
-backend for using CUFFT Library. Some of the toy dataset borrowed from
+backend for using CUFFT Library. PyTorch version needs to be higher than Torch 0.4. Some of the toy dataset borrowed from
 <http://mridata.org>.
 
 1. 2D Reconstruction
@@ -33,6 +34,20 @@ Usage::
 
 ----
 
+3. Dynamic Reconstruction using Convolutional Recurrent Neural Networks
+=========================================================================
+
+Reconstruct dynamic MR images from its undersampled measurements using 
+Convolutional Recurrent Neural Networks. This is a pytorch implementation requiring 
+Torch 0.4.  
+
+Usage::
+
+  python main_crnn.py --acceleration_factor 4
+
+
+----
+
 
 Citation and Acknowledgement
 ============================
@@ -55,3 +70,12 @@ Dynamic Reconstruction::
 ----
 
 The paper is also available on arXiv: <https://arxiv.org/pdf/1704.02422.pdf>
+
+
+Dynamic Reconstruction using CRNN::
+
+  Qin, C., Schlemper, J., Caballero, J., Hajnal, J. V., Price, A., & Rueckert, D. Convolutional Recurrent Neural Networks for Dynamic MR Image Reconstruction. IEEE transactions on medical imaging (2018).
+
+----
+
+The paper is also available on arXiv: <https://arxiv.org/pdf/1712.01751.pdf>
