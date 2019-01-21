@@ -5,21 +5,6 @@ import numpy as np
 import cascadenet_pytorch.kspace_pytorch as cl
 
 
-def load_rec_net(model_name):
-    if model_name == 'dncn':
-        return DnCn
-    elif model_name == 'stochastic-dncn':
-        return StochasticDnCn
-    elif model_name == 'dncn-3d':
-        return DnCn3D
-    elif model_name == 'dncn-ds':
-        return DnCn3DDS
-    elif model_name == 'dncn-s':
-        return DnCn3DShared
-    elif model_name == 'crnn':
-        return CRNN_MRI
-
-
 def lrelu():
     return nn.LeakyReLU(0.01, inplace=True)
 
