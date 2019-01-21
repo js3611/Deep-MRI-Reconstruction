@@ -1,12 +1,8 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.nn.init as init
-import math
 from torch.autograd import Variable, grad
 import numpy as np
-import cascadenet.network.layers.kspace_pytorch as cl
-
+import cascadenet_pytorch.kspace_pytorch as cl
 
 
 def load_rec_net(model_name):
@@ -26,6 +22,7 @@ def load_rec_net(model_name):
 
 def lrelu():
     return nn.LeakyReLU(0.01, inplace=True)
+
 
 def relu():
     return nn.ReLU(inplace=True)
@@ -70,8 +67,6 @@ def conv_block(n_ch, nd, nf=32, ks=3, dilation=1, bn=False, nl='lrelu', conv_dim
     layers += [conv_n]
 
     return nn.Sequential(*layers)
-
-
 
 
 class DnCn(nn.Module):
@@ -226,7 +221,6 @@ class DnCn3DShared(nn.Module):
         self.conv_block = conv_block(n_channels, nd, **kwargs)
         self.dc = cl.DataConsistencyInKspace(norm='ortho')
 
-
     def forward(self, x, k, m):
         for i in range(self.nc):
             x_cnn = self.conv_block(x)
@@ -237,6 +231,20 @@ class DnCn3DShared(nn.Module):
 
 
 class CRNNcell(nn.Module):
+    """
+    Convolutional RNN cell that evolves over both time and iterations
+
+    Parameters
+    -----------------
+    input: 4d tensor, shape (batch_size, channel, width, height)
+    hidden: hidden states in temporal dimension, 4d tensor, shape (batch_size, hidden_size, width, height)
+    hidden_iteration: hidden states in iteration dimension, 4d tensor, shape (batch_size, hidden_size, width, height)
+
+    Returns
+    -----------------
+    output: 4d tensor, shape (batch_size, hidden_size, width, height)
+
+    """
     def __init__(self, input_size, hidden_size, kernel_size):
         super(CRNNcell, self).__init__()
         self.kernel_size = kernel_size
@@ -257,7 +265,20 @@ class CRNNcell(nn.Module):
 
 
 class BCRNNlayer(nn.Module):
-    # input_size: num_seqs, batch_size, channel, width, height
+    """
+    Bidirectional Convolutional RNN layer
+
+    Parameters
+    --------------------
+    incomings: input: 5d tensor, [input_image] with shape (num_seqs, batch_size, channel, width, height)
+               input_iteration: 5d tensor, [hidden states from previous iteration] with shape (n_seq, n_batch, hidden_size, width, height)
+               test: True if in test mode, False if in train mode
+
+    Returns
+    --------------------
+    output: 5d tensor, shape (n_seq, n_batch, hidden_size, width, height)
+
+    """
     def __init__(self, input_size, hidden_size, kernel_size):
         super(BCRNNlayer, self).__init__()
         self.hidden_size = hidden_size
@@ -265,7 +286,7 @@ class BCRNNlayer(nn.Module):
         self.input_size = input_size
         self.CRNN_model = CRNNcell(self.input_size, self.hidden_size, self.kernel_size)
 
-    def forward(self, input, input_iteration, test = False):
+    def forward(self, input, input_iteration, test=False):
         nt, nb, nc, nx, ny = input.shape
         size_h = [nb, self.hidden_size, nx, ny]
         if test:
@@ -301,7 +322,25 @@ class BCRNNlayer(nn.Module):
 
 
 class CRNN_MRI(nn.Module):
-    def __init__(self, n_ch = 2, nf = 64, ks = 3, nc=5, nd=5, **kwargs):
+    """
+    Model for Dynamic MRI Reconstruction using Convolutional Neural Networks
+
+    Parameters
+    -----------------------
+    incomings: three 5d tensors, [input_image, kspace_data, mask], each of shape (batch_size, 2, width, height, n_seq)
+
+    Returns
+    ------------------------------
+    output: 5d tensor, [output_image] with shape (batch_size, 2, width, height, n_seq)
+    """
+    def __init__(self, n_ch=2, nf=64, ks=3, nc=5, nd=5):
+        """
+        :param n_ch: number of channels
+        :param nf: number of filters
+        :param ks: kernel size
+        :param nc: number of iterations
+        :param nd: number of CRNN/BCRNN/CNN layers in each iteration
+        """
         super(CRNN_MRI, self).__init__()
         self.nc = nc
         self.nd = nd
@@ -323,8 +362,13 @@ class CRNN_MRI(nn.Module):
             dcs.append(cl.DataConsistencyInKspace(norm='ortho'))
         self.dcs = dcs
 
-    def forward(self, x,k,m, test=False):
-
+    def forward(self, x, k, m, test=False):
+        """
+        x   - input in image domain, of shape (n, 2, nx, ny, n_seq)
+        k   - initially sampled elements in k-space
+        m   - corresponding nonzero location
+        test - True: the model is in test mode, False: train mode
+        """
         net = {}
         n_batch, n_ch, width, height, n_seq = x.size()
         size_h = [n_seq*n_batch, self.nf, width, height]

@@ -3,10 +3,8 @@ from __future__ import print_function, division
 
 import os
 import time
-import numpy as np
 import torch
 import torch.optim as optim
-import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 import argparse
 import matplotlib.pyplot as plt
@@ -17,9 +15,9 @@ from scipy.io import loadmat
 from utils import compressed_sensing as cs
 from utils.metric import complex_psnr
 
-from cascadenet.network.model_pytorch import *
-from cascadenet.util.dnn_io import to_tensor_format
-from cascadenet.util.dnn_io import from_tensor_format
+from cascadenet_pytorch.model_pytorch import *
+from cascadenet_pytorch.dnn_io import to_tensor_format
+from cascadenet_pytorch.dnn_io import from_tensor_format
 
 
 def prep_input(im, acc=4.0):
@@ -117,13 +115,15 @@ if __name__ == '__main__':
 
     # Specify network
     rec_net = CRNN_MRI()
-    rec_net = rec_net.cuda()
     criterion = torch.nn.MSELoss()
-    criterion.cuda()
     optimizer = optim.Adam(rec_net.parameters(), lr=float(args.lr[0]), betas=(0.5, 0.999))
 
     # # build CRNN-MRI with pre-trained parameters
     # rec_net.load_state_dict(torch.load('./models/pretrained/crnn_mri_d5_c5.pth'))
+
+    if cuda:
+        rec_net = rec_net.cuda()
+        criterion.cuda()
 
     i = 0
     for epoch in range(num_epoch):
@@ -220,7 +220,6 @@ if __name__ == '__main__':
         print(" test PSNR:\t\t{:.6f}".format(test_psnr))
 
         # save the model
-
         if epoch in [1, 2, num_epoch-1]:
             if save_fig:
 
