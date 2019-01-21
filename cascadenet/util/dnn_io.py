@@ -23,7 +23,7 @@ def r2c(x, axis=1):
     return x.reshape(x.shape[:-1])
 
 
-def c2r(x, axis=0):
+def c2r(x, axis=1):
     """Convert complex data to pseudo-complex data (2 real channels)
 
     x: ndarray
