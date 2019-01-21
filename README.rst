@@ -4,7 +4,7 @@ Deep Cascade of Convolutional Neural Networks and Convolutioanl Recurrent Nerual
 
 Reconstruct MR images from its undersampled measurements using Deep Cascade of
 Convolutional Neural Networks (DC-CNN) and Convolutional Recurrent Neural Networks (CRNN-MRI). This repository contains the
-implementation of DC-CNN and CRNN-MRI using Theano, Lasagne and PyTorch, and the simple demo. Note that
+implementation of DC-CNN using Theano and Lasagne, and CRNN-MRI using PyTorch, along with simple demos. Note that
 the library requires the dev version of Lasagne and Theano, as well as pygpu
 backend for using CUFFT Library. PyTorch version needs to be higher than Torch 0.4. Some of the toy dataset borrowed from
 <http://mridata.org>.
