@@ -1,7 +1,7 @@
 import theano
 import lasagne
 from lasagne.layers import Layer, prelu
-from helper import ensure_set_name
+from .helper import ensure_set_name
 
 if theano.config.device == 'cuda':
     from lasagne.layers.dnn import Conv2DDNNLayer as ConvLayer

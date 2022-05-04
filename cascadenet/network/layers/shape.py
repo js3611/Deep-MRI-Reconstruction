@@ -24,9 +24,9 @@ class SubpixelLayer(Layer):
         out = T.zeros((input.shape[0], self.output_shape[1],
                        self.output_shape[2], self.output_shape[3]))
 
-        for x in xrange(self.r):
+        for x in range(self.r):
             # loop across all feature maps belonging to this channel
-            for y in xrange(self.r):
+            for y in range(self.r):
                 out = T.inc_subtensor(out[:, :, x::self.r, y::self.r],
                                       input[:, self.r*x+y::self.r*self.r, :, :])
         return out
@@ -51,10 +51,10 @@ class Subpixel3DLayer(Layer):
         out = T.zeros((input.shape[0], self.output_shape[1],
                        self.output_shape[2], self.output_shape[3], self.output_shape[4]))
 
-        for x in xrange(r):
+        for x in range(r):
             # loop across all feature maps belonging to this channel
-            for y in xrange(r):
-                for z in xrange(r):
+            for y in range(r):
+                for z in range(r):
                     out = T.inc_subtensor(out[..., x::r, y::r, z::r],
                                           input[:, (r**2)*x+(r*y)+z::r*r*r, ...])
         return out

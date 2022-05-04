@@ -104,7 +104,7 @@ def shear_grid_mask(shape, acceleration_rate, sample_low_freq=True,
     Nt, Nx, Ny = shape
     start = np.random.randint(0, acceleration_rate)
     mask = np.zeros((Nt, Nx))
-    for t in xrange(Nt):
+    for t in range(Nt):
         mask[t, (start+t)%acceleration_rate::acceleration_rate] = 1
 
     xc = Nx / 2
@@ -135,15 +135,15 @@ def perturbed_shear_grid_mask(shape, acceleration_rate, sample_low_freq=True,
     Nt, Nx, Ny = shape
     start = np.random.randint(0, acceleration_rate)
     mask = np.zeros((Nt, Nx))
-    for t in xrange(Nt):
+    for t in range(Nt):
         mask[t, (start+t)%acceleration_rate::acceleration_rate] = 1
 
     # brute force
     rand_code = np.random.randint(0, 3, size=Nt*Nx)
     shift = np.array([-1, 0, 1])[rand_code]
     new_mask = np.zeros_like(mask)
-    for t in xrange(Nt):
-        for x in xrange(Nx):
+    for t in range(Nt):
+        for x in range(Nx):
             if mask[t, x]:
                 new_mask[t, (x + shift[t*x])%Nx] = 1
 
