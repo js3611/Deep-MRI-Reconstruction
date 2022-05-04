@@ -1,7 +1,7 @@
 import theano.tensor as T
 import lasagne
 from lasagne.layers import Layer
-from helper import ensure_set_name
+from .helper import ensure_set_name
 
 
 class IdLayer(Layer):

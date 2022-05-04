@@ -84,7 +84,7 @@ class PoolNDLayer(Layer):
 
         tr = len(output_shape) - self.n
 
-        for i in xrange(self.n):
+        for i in range(self.n):
             output_shape[tr+i] = pool.pool_output_length(input_shape[tr+i],
                                                          pool_size=self.pool_size[i],
                                                          stride=self.stride[i],

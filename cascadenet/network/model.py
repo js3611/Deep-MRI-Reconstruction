@@ -8,7 +8,7 @@ def cascade_resnet(pr, net, input_layer, n=5, nf=64, b=lasagne.init.Constant, **
     n_channel = shape[1]
     net[pr+'conv1'] = l.Conv(input_layer, nf, 3, b=b(), name=pr+'conv1')
 
-    for i in xrange(2, n):
+    for i in range(2, n):
         net[pr+'conv%d'%i] = l.Conv(net[pr+'conv%d'%(i-1)], nf, 3, b=b(),
                                     name=pr+'conv%d'%i)
 
@@ -37,7 +37,7 @@ def cascade_resnet_3d_avg(pr, net, input_layer, n=5, nf=64,
     # Conv layers
     net[pr+'conv1'] = l.Conv3D(net[pr+'kavg'], nf, k, b=b(), name=pr+'conv1')
 
-    for i in xrange(2, n):
+    for i in range(2, n):
         net[pr+'conv%d'%i] = l.Conv3D(net[pr+'conv%d'%(i-1)], nf, k, b=b(),
                                       name=pr+'conv%d'%i)
 
@@ -67,7 +67,7 @@ def build_cascade_cnn_from_list(shape, net_meta, lmda=None):
     j = 0
     for cascade_net, cascade_n in net_meta:
         # Cascade layer
-        for i in xrange(cascade_n):
+        for i in range(cascade_n):
             pr = 'c%d_' % j
             net, output_layer = cascade_net(pr, net, input_layer,
                                             **{'cascade_i': j})

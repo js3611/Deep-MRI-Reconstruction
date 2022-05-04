@@ -1,6 +1,6 @@
 import theano.tensor as T
 from lasagne.layers import MergeLayer, get_output
-from fourier import FFT2Layer, FFTCLayer
+from .fourier import FFT2Layer, FFTCLayer
 from cascadenet.network.theano_extensions.fft_helper import fftshift, ifftshift
 from cascadenet.network.theano_extensions.fft import fft, ifft 
 

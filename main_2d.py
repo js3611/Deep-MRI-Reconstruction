@@ -45,7 +45,7 @@ def iterate_minibatch(data, batch_size, shuffle=True):
     if shuffle:
         data = np.random.permutation(data)
 
-    for i in xrange(0, n, batch_size):
+    for i in range(0, n, batch_size):
         yield data[i:i+batch_size]
 
 
@@ -171,7 +171,7 @@ if __name__ == '__main__':
     train, validate, test = create_dummy_data()
 
     print('Start Training...')
-    for epoch in xrange(num_epoch):
+    for epoch in range(num_epoch):
         t_start = time.time()
         # Training
         train_err = 0
